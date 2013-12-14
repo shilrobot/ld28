@@ -14,6 +14,8 @@ class TileSet:
         imageEl = element.find('image')
         imageFilename = os.path.basename(imageEl.attrib['source'])
         self.texture = TextureManager.get().load(imageFilename)
+        self.width = self.texture.width / self.tileWidth
+        self.height = self.texture.height / self.tileHeight
 
 class TilemapLayer:
     def __init__(self, tileWidth, tileHeight, element):
@@ -49,15 +51,16 @@ class Tilemap:
             assert layer.height == self.height
             self.layers.append(layer)
         self.uvCache = {}
+        self.tileset = self.tilesets[0]
 
     def getCoords(self, gid):
         result = self.uvCache.get(gid)
         if result is None:
             iidx = gid-1
-            u0 = (iidx % 2)/2.0
-            u1 = u0 + 0.5
-            v0 = (iidx / 2)/2.0
-            v1 = v0 + 0.5
+            u0 = (iidx % self.tileset.width)/float(self.tileset.width)
+            u1 = u0 + 1.0/self.tileset.width
+            v0 = (iidx / self.tileset.height)/float(self.tileset.height)
+            v1 = v0 + 1.0/self.tileset.height
             v0 = 1-v0
             v1 = 1-v1
             result = (u0,u1,v0,v1)

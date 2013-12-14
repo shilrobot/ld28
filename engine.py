@@ -58,7 +58,8 @@ class Engine:
             self.scrollY += scrollSpeed * delta
 
     def draw(self):
-        glClearColor(0,0,0,1)
+        #glClearColor(0,0,0,1)
+        glClearColor(128/255.0,215/255.0,255/255.0,1)
         glClear(GL_COLOR_BUFFER_BIT)
 
         glMatrixMode(GL_PROJECTION)

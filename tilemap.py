@@ -84,7 +84,6 @@ class Tilemap:
         if maxY > self.height-1:
             maxY = self.height-1
 
-        print minX,minY,maxX,maxY
         for layer in self.layers:
             for y in range(minY,maxY+1):
                 for x in range(minX,maxX+1):

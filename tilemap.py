@@ -23,6 +23,7 @@ class TilemapLayer:
         self.tileHeight = tileHeight
         self.width = int(element.attrib['width'])
         self.height = int(element.attrib['height'])
+        self.name = element.attrib['name']
         dataEl = element.find('data')
         self.tileGIDs = []
         for tileEl in dataEl.iterfind('tile'):
@@ -30,7 +31,6 @@ class TilemapLayer:
         assert len(self.tileGIDs) == self.width*self.height
 
 class Tilemap:
-
     def __init__(self, name):
         tree = ET.parse(os.path.join('maps',name+'.tmx'))
         rootEl = tree.getroot()
@@ -67,27 +67,18 @@ class Tilemap:
             self.uvCache[gid] = result
         return result
 
-    def draw(self, bounds):
+    def draw(self, bounds, prefix):
         self.tilesets[0].texture.bind()
         glColor4f(1,1,1,1)
         glBegin(GL_QUADS)
         tw = self.tileWidth
         th = self.tileHeight
 
-        minX = int(bounds.left / float(tw))
-        minY = int(bounds.top / float(th))
-        maxX = int(bounds.right / float(tw))
-        maxY = int(bounds.bottom / float(th))
-        if minX < 0:
-            minX = 0
-        if minY < 0:
-            minY = 0
-        if maxX > self.width-1:
-            maxX = self.width-1
-        if maxY > self.height-1:
-            maxY = self.height-1
+        minX,minY,maxX,maxY = self.getTileBoundsInclusive(bounds)
 
         for layer in self.layers:
+            if not layer.name.startswith(prefix):
+                continue
             for y in range(minY,maxY+1):
                 for x in range(minX,maxX+1):
                     idx = x + y*layer.width
@@ -103,3 +94,31 @@ class Tilemap:
                         glTexCoord2f(u0, v1)
                         glVertex2f(x*tw, (y+1)*th)
         glEnd()
+
+    def getTileBoundsInclusive(self, rect):
+        tw = self.tileWidth
+        th = self.tileHeight
+        minX = int(rect.left / float(tw))
+        minY = int(rect.top / float(th))
+        maxX = int(rect.right / float(tw))
+        maxY = int(rect.bottom / float(th))
+        if minX < 0:
+            minX = 0
+        if minY < 0:
+            minY = 0
+        if maxX > self.width-1:
+            maxX = self.width-1
+        if maxY > self.height-1:
+            maxY = self.height-1
+        return minX,minY,maxX,maxY
+
+    def rectOverlaps(self, rect):
+        minX,minY,maxX,maxY = self.getTileBoundsInclusive(bounds)
+
+        for layer in self.layers:
+            for y in range(minY,maxY+1):
+                for x in range(minX,maxX+1):
+                    idx = x + y*layer.width
+                    if layer.tileGIDs[idx] != 0:
+                        return True
+        return False

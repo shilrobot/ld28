@@ -3,6 +3,7 @@
 class GameObject(object):
 
 	PRIORITY_BELOW_PLAYER = 100
+	PRIORITY_BUTTON = 150
 	PRIORITY_PLAYER = 200
 	PRIORITY_ABOVE_PLAYER = 300
 
@@ -28,3 +29,14 @@ class GameObject(object):
 		self.x = spawn.x
 		self.y = spawn.y
 
+	def onMapLoaded(self):
+		pass
+
+	def onAdded(self):
+		pass
+
+	def onRemoving(self):
+		pass
+
+	def onRemoved(self):
+		pass

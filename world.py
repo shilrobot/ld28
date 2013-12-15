@@ -3,49 +3,9 @@ from engine import Engine
 import pygame
 from OpenGL.GL import *
 from rect import Rect
-from gameobjects.player import Player
-from gameobjects.oak import Oak
-from gameobjects.willow import Willow
+from gameobjectmanager import GameObjectManager
 
-class GameObjectManager:
-    def __init__(self):
-        self.objects = []
-        self.objectsByName = {}
-
-    def update(self, delta):
-        for go in self.objects:
-            if go is not None:
-                go.update(delta)
-        if any([go is None for go in self.objects]):
-            self.objects = [x for x in self.objects if x is not None]
-            for n,go in enumerate(self.objects):
-                go.index = n
-
-    def draw(self):
-        sortedObjects = sorted([go for go in self.objects if go.visible], key=lambda go:go.priority)
-
-        for go in sortedObjects:
-            go.draw()
-
-    def add(self, go):
-        assert go.index == -1
-        self.objects.append(go)
-        go.index = len(self.objects)-1
-        if go.name is not None and go.name not in self.objectsByName:
-            self.objectsByName[go.name] = go
-
-    def remove(self, go):
-        if go.index == -1:
-            return
-        assert go.index >= 0 and go.index < len(self.objects)
-        assert self.objects[go.index] == go
-        self.objects[go.index] = None
-        if go.name is not None and self.objectsByName.get(go.name) == go:
-            del self.objectsByName[go.name]
-        go.index = -1
-
-    def get(self, name):
-        return go.objectsByName.get(name, None)
+from gameobjects.registry import goRegistry
 
 class World:
 
@@ -58,17 +18,19 @@ class World:
         self.player = None
         for spawn in self.map.spawns:
             self.doSpawn(spawn)
-        #self.player = Player(self)
+        self.goMgr.onMapLoaded()
+        self.services = {}
+
+    def getService(self, name):
+        return self.services.get(name)
+
+    def registerService(self, name, service):
+        self.services[name] = service
 
     def doSpawn(self, spawn):
-        go = None
-        if spawn.type == 'oak':
-            go = Oak(self)
-        elif spawn.type == 'willow':
-            go = Willow(self)
-        elif spawn.type == 'player':
-            go = Player(self)
-        if go is not None:
+        goClass = goRegistry.get(spawn.type)
+        if goClass is not None:
+            go = goClass(self)
             go.spawn(spawn)
             self.goMgr.add(go)
 
@@ -78,18 +40,7 @@ class World:
             delta *= 0.25
         elif self.engine.key_down(pygame.K_f):
             delta *= 4
-        #self.player.update(delta)
-        # scrollSpeed = 300
         self.goMgr.update(delta)
-
-        # if self.engine.key_down(pygame.K_LEFT):
-        #     self.scrollX -= scrollSpeed * delta
-        # if self.engine.key_down(pygame.K_RIGHT):
-        #     self.scrollX += scrollSpeed * delta
-        # if self.engine.key_down(pygame.K_UP):
-        #     self.scrollY -= scrollSpeed * delta
-        # if self.engine.key_down(pygame.K_DOWN):
-        #     self.scrollY += scrollSpeed * delta
 
     def draw(self):
         glClearColor(128/255.0,215/255.0,255/255.0,1)

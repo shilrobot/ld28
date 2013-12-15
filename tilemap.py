@@ -40,6 +40,13 @@ class Spawn:
         self.width = int(element.attrib['width'])
         self.height = int(element.attrib['height'])
         self.rect = Rect(self.x,self.y, self.width,self.height)
+        self.properties = {}
+        propertiesEl = element.find('properties')
+        if propertiesEl is not None:
+            for propertyEl in propertiesEl.iterfind('properties'):
+                key = propertyEl.attrib['name']
+                value = propertyEl.attrib['value']
+                self.properties[key] = value
 
 class Tilemap:
     def __init__(self, name):

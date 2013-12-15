@@ -6,7 +6,7 @@ FRAME_LENGTH = 30/60.0
 
 class Willow(GameObject):
     def __init__(self, world):
-        GameObject.__init__(self,world)
+        super(Willow,self).__init__(world)
         self.texture = TextureManager.get().load('WillowTree.png')
         self.textureWind1 = TextureManager.get().load('WindyWillow1.png')
         self.textureWind2 = TextureManager.get().load('WindyWillow2.png')

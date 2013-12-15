@@ -3,6 +3,9 @@ from rect import Rect
 
 __all__ = ['clamp', 'drawRect']
 
+def lerp(a,b,t):
+    return a + (b-a)*t
+
 def clamp(x,a,b):
     if a > b:
         a,b = b,a

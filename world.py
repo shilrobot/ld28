@@ -15,6 +15,11 @@ class World:
         self.player = Player(self)
 
     def update(self, delta):
+
+        if self.engine.key_down(pygame.K_s):
+            delta *= 0.25
+        elif self.engine.key_down(pygame.K_f):
+            delta *= 4
         self.player.update(delta)
         # scrollSpeed = 300
 

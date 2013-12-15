@@ -8,6 +8,7 @@ ANIM_STAND = 0
 ANIM_WALK = 1
 GRAVITY_ACCEL = 1000
 TERMINAL_VELOCITY = 1000
+JUMP_VEL = 500
 
 WALK_FRAME_TIME = 10/60.0
 
@@ -23,7 +24,9 @@ class Player:
         self.x = 7*32
         self.y = 13*32 - 2
         self.faceRight = True
+        self.vyLast = 0.0
         self.vy = 0.0
+        self.maxY = 10000
 
     def getRect(self,x,y):
         return Rect(x-8, y-60, 16,60)
@@ -43,12 +46,26 @@ class Player:
 
         self.move(dx,0)
 
+        if self.engine.key_pressed(pygame.K_SPACE):
+            if self.vy >= 0 and self.canJump():
+                self.vyLast = -JUMP_VEL
+                self.vy = -JUMP_VEL
+
         self.vy += GRAVITY_ACCEL*delta
         if self.vy > TERMINAL_VELOCITY:
             self.vy = TERMINAL_VELOCITY
-        collidedMovingDown = self.move(0,self.vy*delta)
-        if collidedMovingDown:
+
+        # trapezoidal integration
+        newY = self.y + (self.vyLast + self.vy)*delta*0.5
+
+        yCollision = self.move(0,newY - self.y)
+        if yCollision:
             self.vy = 0
+
+        self.vyLast = self.vy
+
+        self.maxY = min(self.maxY, self.y)
+        print self.maxY
 
         # Update animations
 
@@ -63,6 +80,9 @@ class Player:
         if self.anim == ANIM_WALK:
             self.animTime += delta
             self.animTime = self.animTime % (WALK_FRAME_TIME*2)
+
+    def canJump(self):
+        return self.world.map.rectOverlaps(self.getRect(self.x, self.y+0.5))
 
     def move(self, dx, dy):
         map = self.world.map

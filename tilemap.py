@@ -113,7 +113,7 @@ class Tilemap:
         return minX,minY,maxX,maxY
 
     def rectOverlaps(self, rect):
-        minX,minY,maxX,maxY = self.getTileBoundsInclusive(bounds)
+        minX,minY,maxX,maxY = self.getTileBoundsInclusive(rect)
 
         for layer in self.layers:
             for y in range(minY,maxY+1):

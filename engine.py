@@ -28,6 +28,8 @@ class Engine:
         glEnable(GL_TEXTURE_2D)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glDisable(GL_CULL_FACE)
+        glDepthMask(GL_FALSE)
+        glDisable(GL_DEPTH_TEST)
 
         TextureManager()
 

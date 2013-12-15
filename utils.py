@@ -1,4 +1,5 @@
 from OpenGL.GL import *
+from rect import Rect
 
 __all__ = ['clamp', 'drawRect']
 
@@ -11,6 +12,32 @@ def clamp(x,a,b):
         return b
     else:
         return x
+
+def noTexture():
+    glDisable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+def debugRect(rect, r,g,b,a=1):
+    noTexture()
+
+
+    glBegin(GL_LINES)
+    glColor4f(r,g,b,a)
+
+    glVertex2f(rect.left,rect.top)
+    glVertex2f(rect.right,rect.top)
+
+    glVertex2f(rect.right,rect.top)
+    glVertex2f(rect.right,rect.bottom)
+
+    glVertex2f(rect.right,rect.bottom)
+    glVertex2f(rect.left,rect.bottom)
+
+    glVertex2f(rect.left,rect.bottom)
+    glVertex2f(rect.left,rect.top)
+
+
+    glEnd()
 
 def drawRect(texture, x, y, anchorX=0, anchorY=0, flipX=False, flipY=False):
     u0 = 0
@@ -48,7 +75,7 @@ def drawRect(texture, x, y, anchorX=0, anchorY=0, flipX=False, flipY=False):
     glVertex2f(x0,y1)
     glEnd()
 
-    glBindTexture(GL_TEXTURE_2D, 0)
+    noTexture()
     glBegin(GL_LINES)
     glColor4f(1,0,0,1)
     glVertex2f(x-5,y)

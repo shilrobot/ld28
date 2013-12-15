@@ -22,6 +22,7 @@ class Texture:
         self.height = h
 
     def bind(self):
+        glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.texID)
 
 class TextureManager:

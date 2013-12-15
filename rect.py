@@ -1,5 +1,5 @@
 
-class Rect:
+class Rect(object):
     def __init__(self, x,y,w,h):
         self.x,self.y,self.w,self.h = x,y,w,h
 
@@ -42,3 +42,13 @@ class Rect:
         c = self.copy()
         c.normalize()
         return c
+
+    def mergedCopy(self, other):
+        minX = min(self.x, other.x)
+        minY = min(self.y, other.y)
+        maxX = max(self.right, other.right)
+        maxY = max(self.bottom, other.bottom)
+        return Rect(minX, minY, maxX-minX, maxY-minY)
+
+    def __repr__(self):
+        return 'Rect(%g,%g,%g,%g)' % (self.x,self.y,self.w,self.h)

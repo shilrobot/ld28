@@ -33,6 +33,10 @@ class World:
 
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+
+        self.scrollX = self.player.x - self.engine.screenWidth*0.5
+        self.scrollY = self.player.y - self.engine.screenHeight*0.5
+
         glTranslate(-self.scrollX, -self.scrollY, 0)
 
         boundRect = Rect(self.scrollX,

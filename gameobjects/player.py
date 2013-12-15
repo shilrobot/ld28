@@ -27,6 +27,7 @@ class Player(GameObject):
         self.vyLast = 0.0
         self.vy = 0.0
         world.player = self
+        self.priority = GameObject.PRIORITY_PLAYER
 
     def spawn(self,spawn):
         self.x = spawn.rect.centerX

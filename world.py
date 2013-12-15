@@ -3,8 +3,9 @@ from engine import Engine
 import pygame
 from OpenGL.GL import *
 from rect import Rect
-from player import Player
-from oak import Oak
+from gameobjects.player import Player
+from gameobjects.oak import Oak
+from gameobjects.willow import Willow
 
 class World:
 
@@ -23,6 +24,8 @@ class World:
         go = None
         if spawn.type == 'oak':
             go = Oak(self)
+        elif spawn.type == 'willow':
+            go = Willow(self)
         elif spawn.type == 'player':
             go = Player(self)
         if go is not None:
@@ -69,7 +72,9 @@ class World:
         self.map.draw(boundRect,'bg')
         self.map.draw(boundRect,'fg')
 
-        for go in self.objects:
+        sortedObjects = sorted(self.objects, key=lambda go:go.priority)
+
+        for go in sortedObjects:
             # TODO: pass in bounds
             go.draw()
 

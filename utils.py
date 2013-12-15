@@ -42,7 +42,7 @@ def debugRect(rect, r,g,b,a=1):
 
     glEnd()
 
-def drawRect(texture, x, y, anchorX=0, anchorY=0, flipX=False, flipY=False):
+def drawRect(texture, x, y, anchorX=0, anchorY=0, flipX=False, flipY=False, scale=1):
     u0 = 0
     u1 = 1
     v0 = 1
@@ -58,6 +58,11 @@ def drawRect(texture, x, y, anchorX=0, anchorY=0, flipX=False, flipY=False):
     if flipY:
         localY0 *= -1
         localY1 *= -1
+
+    localX0 *= scale
+    localX1 *= scale
+    localY0 *= scale
+    localY1 *= scale
 
     x0 = x + localX0
     x1 = x + localX1

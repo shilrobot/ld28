@@ -907,7 +907,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="fg" width="30" height="30">
+ <layer name="fg_collide" width="30" height="30">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>

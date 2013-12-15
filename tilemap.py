@@ -40,6 +40,7 @@ class Tilemap:
         self.height = int(rootEl.attrib['height'])
         self.layers = []
         self.tilesets = []
+        self.collideLayers = []
         for tilesetEl in rootEl.iterfind('tileset'):
             ts = TileSet(tilesetEl)
             assert ts.tileWidth == self.tileWidth
@@ -49,6 +50,8 @@ class Tilemap:
             layer = TilemapLayer(self.tileWidth, self.tileHeight, layerEl)
             assert layer.width == self.width
             assert layer.height == self.height
+            if 'collide' in layer.name:
+                self.collideLayers.append(layer)
             self.layers.append(layer)
         self.uvCache = {}
         self.tileset = self.tilesets[0]
@@ -115,7 +118,8 @@ class Tilemap:
     def rectOverlaps(self, rect):
         minX,minY,maxX,maxY = self.getTileBoundsInclusive(rect)
 
-        for layer in self.layers:
+        for layer in self.collideLayers:
+
             for y in range(minY,maxY+1):
                 for x in range(minX,maxX+1):
                     idx = x + y*layer.width

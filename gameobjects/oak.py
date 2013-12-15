@@ -8,6 +8,7 @@ class Oak(GameObject):
         self.texture = TextureManager.get().load('OakTree.png')
 
     def spawn(self,spawn):
+        super(Oak,self).spawn(spawn)
         self.x = spawn.rect.centerX
         self.y = spawn.rect.bottom - 1
 

@@ -30,6 +30,7 @@ class Player(GameObject):
         self.priority = GameObject.PRIORITY_PLAYER
 
     def spawn(self,spawn):
+        super(Player,self).spawn(spawn)
         self.x = spawn.rect.centerX
         self.y = spawn.rect.bottom - 1
 
@@ -83,6 +84,10 @@ class Player(GameObject):
             animDelta = delta
             self.animTime += animDelta
             self.animTime = self.animTime % (WALK_FRAME_TIME*2)
+
+
+        if self.engine.key_pressed(pygame.K_k):
+            self.world.goMgr.remove(self)
 
     def canJump(self):
         return self.world.map.rectOverlaps(self.getRect(self.x, self.y+0.5))

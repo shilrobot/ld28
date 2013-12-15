@@ -13,6 +13,9 @@ class GameObject(object):
 		self.world = world
 		self.engine = world.engine
 		self.priority = GameObject.PRIORITY_BELOW_PLAYER
+		self.visible = True
+		self.index = -1
+		self.name = None
 
 	def draw(self):
 		pass
@@ -21,6 +24,7 @@ class GameObject(object):
 		pass
 
 	def spawn(self, spawn):
+		self.name = spawn.name
 		self.x = spawn.x
 		self.y = spawn.y
 

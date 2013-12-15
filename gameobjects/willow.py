@@ -13,6 +13,7 @@ class Willow(GameObject):
         self.animTime = 0
 
     def spawn(self,spawn):
+        super(Willow,self).spawn(spawn)
         self.x = spawn.rect.centerX
         self.y = spawn.rect.bottom - 1
 

@@ -2,6 +2,7 @@ from rect import Rect
 from texturemanager import TextureManager
 import pygame
 from utils import drawRect, debugRect
+from gameobject import GameObject
 
 WALK_SPEED = 300.0
 ANIM_STAND = 0
@@ -12,21 +13,24 @@ JUMP_VEL = 570
 
 WALK_FRAME_TIME = 10/60.0
 
-class Player:
+class Player(GameObject):
     def __init__(self, world):
-        self.world = world
-        self.engine = self.world.engine
+        GameObject.__init__(self, world)
         self.texStand = TextureManager.get().load('player.png')
         self.texWalk1 = TextureManager.get().load('playerwalk1.png')
         self.texWalk2 = TextureManager.get().load('playerwalk2.png')
         self.anim = ANIM_STAND
         self.animTime = 0
-        self.x = 7*32
-        self.y = 13*32 - 2
+        #self.x = 7*32
+        #self.y = 13*32 - 2
         self.faceRight = True
         self.vyLast = 0.0
         self.vy = 0.0
-        self.maxY = 10000
+        world.player = self
+
+    def spawn(self,spawn):
+        self.x = spawn.rect.centerX
+        self.y = spawn.rect.bottom - 1
 
     def getRect(self,x,y):
         return Rect(x-8, y-60, 16,60)
@@ -64,9 +68,6 @@ class Player:
 
         self.vyLast = self.vy
 
-        self.maxY = min(self.maxY, self.y)
-        print self.maxY
-
         # Update animations
 
         if moving:
@@ -78,7 +79,8 @@ class Player:
             self.animTime = 0
 
         if self.anim == ANIM_WALK:
-            self.animTime += delta
+            animDelta = delta
+            self.animTime += animDelta
             self.animTime = self.animTime % (WALK_FRAME_TIME*2)
 
     def canJump(self):

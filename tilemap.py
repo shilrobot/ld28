@@ -3,6 +3,7 @@ from texturemanager import TextureManager
 import xml.etree.ElementTree as ET
 import os
 from OpenGL.GL import *
+from rect import Rect
 
 class TileSet:
     def __init__(self, element):
@@ -30,6 +31,16 @@ class TilemapLayer:
             self.tileGIDs.append(int(tileEl.attrib['gid']))
         assert len(self.tileGIDs) == self.width*self.height
 
+class Spawn:
+    def __init__(self, element):
+        self.name = element.attrib.get('name',None)
+        self.type = element.attrib.get('type',None)
+        self.x = int(element.attrib['x'])
+        self.y = int(element.attrib['y'])
+        self.width = int(element.attrib['width'])
+        self.height = int(element.attrib['height'])
+        self.rect = Rect(self.x,self.y, self.width,self.height)
+
 class Tilemap:
     def __init__(self, name):
         tree = ET.parse(os.path.join('maps',name+'.tmx'))
@@ -55,6 +66,10 @@ class Tilemap:
             self.layers.append(layer)
         self.uvCache = {}
         self.tileset = self.tilesets[0]
+        self.spawns = []
+        for objectGroupEl in rootEl.iterfind('objectgroup'):
+            for objectEl in objectGroupEl.iterfind('object'):
+                self.spawns.append(Spawn(objectEl))
 
     def getCoords(self, gid):
         result = self.uvCache.get(gid)

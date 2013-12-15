@@ -4,6 +4,7 @@ import pygame
 from OpenGL.GL import *
 from rect import Rect
 from player import Player
+from oak import Oak
 
 class World:
 
@@ -12,7 +13,21 @@ class World:
         self.scrollX = 0
         self.scrollY = 0
         self.map = Tilemap('test')
-        self.player = Player(self)
+        self.objects = []
+        self.player = None
+        for spawn in self.map.spawns:
+            self.doSpawn(spawn)
+        #self.player = Player(self)
+
+    def doSpawn(self, spawn):
+        go = None
+        if spawn.type == 'oak':
+            go = Oak(self)
+        elif spawn.type == 'player':
+            go = Player(self)
+        if go is not None:
+            go.spawn(spawn)
+            self.objects.append(go)
 
     def update(self, delta):
 
@@ -20,8 +35,10 @@ class World:
             delta *= 0.25
         elif self.engine.key_down(pygame.K_f):
             delta *= 4
-        self.player.update(delta)
+        #self.player.update(delta)
         # scrollSpeed = 300
+        for go in self.objects:
+            go.update(delta)
 
         # if self.engine.key_down(pygame.K_LEFT):
         #     self.scrollX -= scrollSpeed * delta
@@ -39,8 +56,9 @@ class World:
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-        self.scrollX = self.player.x - self.engine.screenWidth*0.5
-        self.scrollY = self.player.y - self.engine.screenHeight*0.5
+        if self.player is not None:
+            self.scrollX = self.player.x - self.engine.screenWidth*0.5
+            self.scrollY = self.player.y - self.engine.screenHeight*0.5
 
         glTranslate(-self.scrollX, -self.scrollY, 0)
 
@@ -50,4 +68,9 @@ class World:
                         self.engine.screenHeight)
         self.map.draw(boundRect,'bg')
         self.map.draw(boundRect,'fg')
-        self.player.draw()
+
+        for go in self.objects:
+            # TODO: pass in bounds
+            go.draw()
+
+        #self.player.draw()

@@ -15,14 +15,12 @@ WALK_FRAME_TIME = 10/60.0
 
 class Player(GameObject):
     def __init__(self, world):
-        GameObject.__init__(self, world)
+        super(Player,self).__init__(world)
         self.texStand = TextureManager.get().load('player.png')
         self.texWalk1 = TextureManager.get().load('playerwalk1.png')
         self.texWalk2 = TextureManager.get().load('playerwalk2.png')
         self.anim = ANIM_STAND
         self.animTime = 0
-        #self.x = 7*32
-        #self.y = 13*32 - 2
         self.faceRight = True
         self.vyLast = 0.0
         self.vy = 0.0
@@ -37,26 +35,45 @@ class Player(GameObject):
     def getRect(self,x,y):
         return Rect(x-8, y-60, 16,60)
 
-    def update(self, delta):
+    def getButtonActivationRect(self):
+        if self.faceRight:
+            return Rect(self.x-16, self.y-60, 32+16,60)
+        else:
+            return Rect(self.x-32,self.y-60,32+16,60)
+
+    def setAnimation(self, anim):
+        if self.anim == anim:
+            return
+        self.anim = anim
+        self.animTime = 0
+
+    def updateXMovement(self,delta):
         dx = 0
         moving = False
 
-        if self.engine.key_down(pygame.K_LEFT):
+        if self.engine.key_down(pygame.K_LEFT) or self.engine.key_down(pygame.K_a):
             dx -= WALK_SPEED*delta
             self.faceRight = False
             moving = True
-        if self.engine.key_down(pygame.K_RIGHT):
+        if self.engine.key_down(pygame.K_RIGHT) or self.engine.key_down(pygame.K_d):
             dx += WALK_SPEED*delta
             self.faceRight = True
             moving = True
 
         self.move(dx,0)
 
+        if moving:
+            self.setAnimation(ANIM_WALK)
+        else:
+            self.setAnimation(ANIM_STAND)
+
+    def updateJumping(self):
         if self.engine.key_pressed(pygame.K_SPACE):
             if self.vy >= 0 and self.canJump():
                 self.vyLast = -JUMP_VEL
                 self.vy = -JUMP_VEL
 
+    def updateYMovement(self, delta):
         self.vy += GRAVITY_ACCEL*delta
         if self.vy > TERMINAL_VELOCITY:
             self.vy = TERMINAL_VELOCITY
@@ -70,35 +87,33 @@ class Player(GameObject):
 
         self.vyLast = self.vy
 
-        # Update animations
-
-        if moving:
-            if self.anim != ANIM_WALK:
-                self.anim = ANIM_WALK
-                self.animTime = 0
-        else:
-            self.anim = ANIM_STAND
-            self.animTime = 0
-
+    def updateAnimations(self, delta):
         if self.anim == ANIM_WALK:
-            animDelta = delta
-            self.animTime += animDelta
+            self.animTime += delta
             self.animTime = self.animTime % (WALK_FRAME_TIME*2)
 
+    def updateButtonInteraction(self):
+        if self.engine.key_pressed(pygame.K_e):
+            button = self.world.goMgr.get('button')
+            if button is not None and self.getButtonActivationRect().intersects(button.getRect()):
+                button.activate()
 
-        if self.engine.key_pressed(pygame.K_k):
-            self.world.goMgr.remove(self)
+    def update(self, delta):
+        self.updateXMovement(delta)
+        self.updateJumping()
+        self.updateYMovement(delta)
+        self.updateAnimations(delta)
+        self.updateButtonInteraction()
 
     def canJump(self):
-        return self.world.map.rectOverlaps(self.getRect(self.x, self.y+0.5))
+        return self.world.rectOverlaps(self.getRect(self.x, self.y+0.5))
 
     def move(self, dx, dy):
-        map = self.world.map
         startRect = self.getRect(self.x,self.y)
         endRect = self.getRect(self.x+dx,self.y+dy)
         merged = startRect.mergedCopy(endRect)
 
-        if not map.rectOverlaps(merged):
+        if not self.world.rectOverlaps(merged):
             self.x += dx
             self.y += dy
             return False
@@ -107,7 +122,7 @@ class Player(GameObject):
         maxT = 1
         for n in range(10):
             testT = (minT+maxT)*0.5
-            if map.rectOverlaps(self.getRect(self.x+dx*testT,self.y+dy*testT)):
+            if self.world.rectOverlaps(self.getRect(self.x+dx*testT,self.y+dy*testT)):
                 maxT = testT
             else:
                 minT = testT
@@ -128,4 +143,4 @@ class Player(GameObject):
                 tex = self.texWalk2
 
         drawRect(tex, self.x, self.y, anchorX=0.5, anchorY=1, flipX=not self.faceRight)
-        #debugRect(self.getRect(self.x,self.y), 1,0,0)
+        # debugRect(self.getButtonActivationRect(), 1,0,0)

@@ -50,5 +50,14 @@ class Rect(object):
         maxY = max(self.bottom, other.bottom)
         return Rect(minX, minY, maxX-minX, maxY-minY)
 
+    def intersects(self, other):
+        if (self.right < other.left or
+            self.left > other.right or
+            self.bottom < other.top or
+            self.top > other.bottom):
+            return False
+        else:
+            return True
+
     def __repr__(self):
         return 'Rect(%g,%g,%g,%g)' % (self.x,self.y,self.w,self.h)

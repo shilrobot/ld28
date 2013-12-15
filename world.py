@@ -14,6 +14,7 @@ class World:
         self.scrollX = 0
         self.scrollY = 0
         self.map = Tilemap('test')
+        self.blockers = [self.map]
         self.goMgr = GameObjectManager()
         self.player = None
         for spawn in self.map.spawns:
@@ -33,13 +34,15 @@ class World:
             go = goClass(self)
             go.spawn(spawn)
             self.goMgr.add(go)
+        else:
+            print 'Unknown GO class: %s' % spawn.type
 
     def update(self, delta):
 
-        if self.engine.key_down(pygame.K_s):
-            delta *= 0.25
-        elif self.engine.key_down(pygame.K_f):
-            delta *= 4
+        # if self.engine.key_down(pygame.K_s):
+        #     delta *= 0.25
+        # elif self.engine.key_down(pygame.K_f):
+        #     delta *= 4
         self.goMgr.update(delta)
 
     def draw(self):
@@ -60,6 +63,13 @@ class World:
                         self.engine.screenWidth,
                         self.engine.screenHeight)
         self.map.draw(boundRect,'bg')
+        self.goMgr.prepareDraw()
+        self.goMgr.drawBelowFG()
         self.map.draw(boundRect,'fg')
+        self.goMgr.drawAboveFG()
 
-        self.goMgr.draw()
+    def rectOverlaps(self, rect):
+        for blocker in self.blockers:
+            if blocker.rectOverlaps(rect):
+                return True
+        return False

@@ -4,8 +4,9 @@ from utils import drawRect
 
 class Oak(GameObject):
     def __init__(self, world):
-        GameObject.__init__(self,world)
-        self.texture = TextureManager.get().load('Oak2.png')
+        super(Oak,self).__init__(world)
+        self.texture = TextureManager.get().load('oak2.png')
+        self.priority = GameObject.PRIORITY_BELOW_FG
 
     def spawn(self,spawn):
         super(Oak,self).spawn(spawn)

@@ -43,10 +43,11 @@ class Spawn:
         self.properties = {}
         propertiesEl = element.find('properties')
         if propertiesEl is not None:
-            for propertyEl in propertiesEl.iterfind('properties'):
+            for propertyEl in propertiesEl.iterfind('property'):
                 key = propertyEl.attrib['name']
                 value = propertyEl.attrib['value']
                 self.properties[key] = value
+
 
 class Tilemap:
     def __init__(self, name):

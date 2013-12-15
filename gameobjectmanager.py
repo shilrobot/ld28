@@ -1,3 +1,4 @@
+from gameobject import GameObject
 
 class GameObjectManager:
     def __init__(self):
@@ -13,10 +14,22 @@ class GameObjectManager:
             for n,go in enumerate(self.objects):
                 go.index = n
 
-    def draw(self):
+    def prepareDraw(self):
+        self.belowFG = []
+        self.aboveFG = []
         sortedObjects = sorted([go for go in self.objects if go.visible], key=lambda go:go.priority)
-
         for go in sortedObjects:
+            if go.priority < GameObject.PRIORITY_FG:
+                self.belowFG.append(go)
+            else:
+                self.aboveFG.append(go)
+
+    def drawBelowFG(self):
+        for go in self.belowFG:
+            go.draw()
+
+    def drawAboveFG(self):
+        for go in self.aboveFG:
             go.draw()
 
     def add(self, go):
@@ -40,7 +53,10 @@ class GameObjectManager:
         go.onRemoved()
 
     def get(self, name):
-        return go.objectsByName.get(name, None)
+        result = self.objectsByName.get(name, None)
+        if result is not None:
+            assert result.index >= 0 and self.objects[result.index] == result
+        return result
 
     def onMapLoaded(self):
         for go in self.objects:

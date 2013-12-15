@@ -2,6 +2,8 @@
 
 class GameObject(object):
 
+	PRIORITY_BELOW_FG = 0
+	PRIORITY_FG = 50
 	PRIORITY_BELOW_PLAYER = 100
 	PRIORITY_BUTTON = 150
 	PRIORITY_PLAYER = 200
@@ -25,6 +27,7 @@ class GameObject(object):
 		pass
 
 	def spawn(self, spawn):
+		self.spawn = spawn
 		self.name = spawn.name
 		self.x = spawn.x
 		self.y = spawn.y
@@ -39,4 +42,7 @@ class GameObject(object):
 		pass
 
 	def onRemoved(self):
+		pass
+
+	def activate(self):
 		pass

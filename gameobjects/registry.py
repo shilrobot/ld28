@@ -12,7 +12,8 @@ goTypes = [
     'Player',
     'Willow',
     'Door',
-    'BustedDoor'
+    'BustedDoor',
+    'Bridge'
 ]
 
 for goType in goTypes:

@@ -42,9 +42,9 @@ class Button(GameObject):
 
     def onMapLoaded(self):
         if 'attachedTo' in self.spawn.properties:
-            self.attachedTo = self.world.goMgr.get(self.spawn.properties['attachedTo'])
-            if self.attachedTo is not None:
-                self.state = STATE_ATTACHED
+            attachTo = self.world.goMgr.get(self.spawn.properties['attachedTo'])
+            if attachTo is not None:
+                self.attachTo(attachTo)
 
     def draw(self):
         #debugRect(self.getRect(), 0,1,1)

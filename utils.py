@@ -20,7 +20,7 @@ def noTexture():
     glDisable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, 0)
 
-def debugPoint(x,y, r,g,b,a=1,size=5):
+def debugPoint(x,y, r,g,b,a=1,size=10):
     hsize = size*0.5
     noTexture()
     glBegin(GL_LINES)

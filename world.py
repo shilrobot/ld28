@@ -15,6 +15,7 @@ class World:
         self.scrollY = 0
         self.map = Tilemap('test')
         self.blockers = [self.map]
+        self.buttonMounts = []
         self.goMgr = GameObjectManager()
         self.player = None
         for spawn in self.map.spawns:
@@ -73,3 +74,9 @@ class World:
             if blocker.rectOverlaps(rect):
                 return True
         return False
+
+    def findButtonMount(self, rect):
+        for bm in self.buttonMounts:
+            if bm.getButtonMountRect().intersects(rect):
+                return bm
+        return None

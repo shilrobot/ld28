@@ -140,6 +140,8 @@ class Tilemap:
 
     def rectOverlaps(self, rect):
         minX,minY,maxX,maxY = self.getTileBoundsInclusive(rect)
+        tw = self.tileWidth
+        th = self.tileHeight
 
         for layer in self.collideLayers:
 
@@ -147,5 +149,7 @@ class Tilemap:
                 for x in range(minX,maxX+1):
                     idx = x + y*layer.width
                     if layer.tileGIDs[idx] != 0:
-                        return True
+                        r = Rect(x*tw, y*th, tw,th)
+                        if r.intersects(rect):
+                            return True
         return False

@@ -1,7 +1,7 @@
 from rect import Rect
 from texturemanager import TextureManager
 import pygame
-from utils import drawRect, debugRect, sweepMovement
+from utils import drawRect, debugRect, sweepMovement, debugPoint
 from gameobject import GameObject
 
 WALK_SPEED = 300.0
@@ -19,6 +19,7 @@ class Player(GameObject):
         self.texStand = TextureManager.get().load('player.png')
         self.texWalk1 = TextureManager.get().load('playerwalk1.png')
         self.texWalk2 = TextureManager.get().load('playerwalk2.png')
+        self.buttonTex = TextureManager.get().load('TheButton.png')
         self.anim = ANIM_STAND
         self.animTime = 0
         self.faceRight = True
@@ -93,10 +94,23 @@ class Player(GameObject):
             self.animTime = self.animTime % (WALK_FRAME_TIME*2)
 
     def updateButtonInteraction(self):
+        button = self.getButton()
+        if button is None:
+            return
         if self.engine.key_pressed(pygame.K_e):
-            button = self.world.goMgr.get('button')
-            if button is not None and self.getButtonActivationRect().intersects(button.getRect()):
+            if self.getButtonActivationRect().intersects(button.getRect()):
                 button.activate()
+        elif self.engine.key_pressed(pygame.K_q):
+            if self.isHoldingButton():
+                mount = self.world.findButtonMount(self.getButtonActivationRect())
+                if mount is not None:
+                    button.attachTo(mount)
+                else:
+                    self.dropButton()
+            else:
+                if self.getButtonActivationRect().intersects(button.getRect()):
+                    button.becomeHeld()
+
 
     def update(self, delta):
         self.updateXMovement(delta)
@@ -114,9 +128,35 @@ class Player(GameObject):
         self.y += movedY
         return collided
 
-    def draw(self):
-        #print 'draw %f,%f' % (self.x, self.y)
+    def getButtonLocation(self, frameTex):
+        if frameTex == self.texStand:
+            return (12,-25)
+        elif frameTex == self.texWalk1:
+            return (12,-34)
+        elif frameTex == self.texWalk2:
+            return (11,-24)
+        else:
+            return (0,0)
 
+    def getButton(self):
+        return self.world.goMgr.get('button')
+
+    def isHoldingButton(self):
+        button = self.getButton()
+        return button is not None and button.isHeld()
+
+    def buttonExists(self):
+        return self.getButton() is not None
+
+    def dropButton(self):
+        if not self.isHoldingButton():
+            return
+        button = self.getButton()
+        button.x = self.x + (12 if self.faceRight else -12)
+        button.y = self.y - 25
+        button.popOff()
+
+    def draw(self):
         if self.anim == ANIM_STAND:
             tex = self.texStand
         elif self.anim == ANIM_WALK:
@@ -126,4 +166,14 @@ class Player(GameObject):
                 tex = self.texWalk2
 
         drawRect(tex, self.x, self.y, anchorX=0.5, anchorY=1, flipX=not self.faceRight)
-        # debugRect(self.getButtonActivationRect(), 1,0,0)
+
+        if self.isHoldingButton():
+            buttonDX, buttonDY = self.getButtonLocation(tex)
+            if not self.faceRight:
+                buttonDX = -buttonDX
+            drawRect(self.buttonTex,
+                        self.x+buttonDX,
+                        self.y+buttonDY, 
+                        anchorX=1,
+                        anchorY=0.5,
+                        flipX=self.faceRight)

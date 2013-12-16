@@ -47,6 +47,11 @@ class Button(GameObject):
                 self.state = STATE_ATTACHED
 
     def draw(self):
+        #debugRect(self.getRect(), 0,1,1)
+
+        if self.state == STATE_HELD:
+            return
+
         if self.facing == Button.FACING_LEFT:
             drawRect(self.texSide, self.x, self.y, anchorX=1, anchorY=0.5)
         elif self.facing == Button.FACING_RIGHT:
@@ -62,6 +67,13 @@ class Button(GameObject):
         if self.state == STATE_ATTACHED:
             self.attachedTo.activate()
 
+    def becomeHeld(self):
+        self.state = STATE_HELD
+        self.facing = Button.FACING_FORWARD
+
+    def isOnGround(self):
+        return sweepMovement(self.world, self.getRect(), 0, 0.5)[0]
+
     def update(self, delta):
         if self.state == STATE_UNATTACHED:
             self.vy += GRAVITY_ACCEL * delta
@@ -76,4 +88,11 @@ class Button(GameObject):
         self.attachedTo = None
         self.vy = 0
 
+    def isHeld(self):
+        return self.state == STATE_HELD
 
+    def attachTo(self, attachTo):
+        if attachTo is not None:
+            self.state = STATE_ATTACHED
+            self.facing,self.x,self.y = attachTo.getButtonMountInfo()
+            self.attachedTo = attachTo

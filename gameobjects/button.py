@@ -5,6 +5,7 @@ from rect import Rect
 
 STATE_ATTACHED = 1
 STATE_UNATTACHED = 2
+STATE_HELD = 3
 
 GRAVITY_ACCEL = 1500
 TERMINAL_VELOCITY = 1000
@@ -74,4 +75,5 @@ class Button(GameObject):
         self.state = STATE_UNATTACHED
         self.attachedTo = None
         self.vy = 0
+
 

@@ -20,6 +20,17 @@ def noTexture():
     glDisable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, 0)
 
+def debugPoint(x,y, r,g,b,a=1,size=5):
+    hsize = size*0.5
+    noTexture()
+    glBegin(GL_LINES)
+    glColor4f(r,g,b,a)
+    glVertex2f(x-hsize,y)
+    glVertex2f(x+hsize,y)
+    glVertex2f(x,y-hsize)
+    glVertex2f(x,y+hsize)
+    glEnd()
+
 def debugRect(rect, r,g,b,a=1):
     noTexture()
 

@@ -112,6 +112,7 @@ class Player(GameObject):
         collided, movedX, movedY = sweepMovement(self.world, self.getRect(self.x,self.y), dx, dy)
         self.x += movedX
         self.y += movedY
+        return collided
 
     def draw(self):
         #print 'draw %f,%f' % (self.x, self.y)

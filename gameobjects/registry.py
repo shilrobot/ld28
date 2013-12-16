@@ -3,7 +3,7 @@ goRegistry = {}
 def register(name):
     exec ("from gameobjects.%s import %s as GOCLASS" % (name.lower(), name))
     goRegistry[name.lower()] = GOCLASS
-    print name.lower(), GOCLASS
+    #print name.lower(), GOCLASS
 
 goTypes = [
     'Button',
@@ -11,11 +11,12 @@ goTypes = [
     'Oak',
     'Player',
     'Willow',
-    'Door'
+    'Door',
+    'BustedDoor'
 ]
 
 for goType in goTypes:
-    print 'Registering %s' % goType
+    #print 'Registering %s' % goType
     register(goType)
 
 __all__ = ['goRegistry']

@@ -91,3 +91,31 @@ def drawRect(texture, x, y, anchorX=0, anchorY=0, flipX=False, flipY=False, scal
     # glVertex2f(x,y-5)
     # glVertex2f(x,y+5)
     # glEnd()
+
+
+def sweepMovement(world, rect, dx, dy):
+    startRect = rect.copy()
+    endRect = rect.copy()
+    endRect.x += dx
+    endRect.y += dy
+    merged = startRect.mergedCopy(endRect)
+
+    if not world.rectOverlaps(merged):
+        return (False, dx, dy)
+
+    minT = 0
+    maxT = 1
+    for n in range(10):
+        testT = (minT+maxT)*0.5
+        testRect = rect.copy()
+        testRect.x += dx*testT
+        testRect.y += dy*testT
+        if world.rectOverlaps(testRect):
+            maxT = testT
+        else:
+            minT = testT
+
+    if minT >= 1:
+        return (False, dx, dy)
+    else:
+        return (True, dx*minT, dy*minT)

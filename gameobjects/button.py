@@ -1,7 +1,13 @@
 from gameobject import GameObject
 from texturemanager import TextureManager
-from utils import drawRect,debugRect
+from utils import drawRect,debugRect,sweepMovement
 from rect import Rect
+
+STATE_ATTACHED = 1
+STATE_UNATTACHED = 2
+
+GRAVITY_ACCEL = 1500
+TERMINAL_VELOCITY = 1000
 
 class Button(GameObject):
 
@@ -14,8 +20,10 @@ class Button(GameObject):
         self.texSide = TextureManager.get().load('TheButton.png')
         self.texFacing = TextureManager.get().load('ButtonFacing.png')
         self.facing = Button.FACING_FORWARD
+        self.state = STATE_UNATTACHED
         self.attachedTo = None
         self.name = 'button'
+        self.vy = 0
 
     def getRect(self):
         if self.facing == Button.FACING_LEFT:
@@ -34,6 +42,8 @@ class Button(GameObject):
     def onMapLoaded(self):
         if 'attachedTo' in self.spawn.properties:
             self.attachedTo = self.world.goMgr.get(self.spawn.properties['attachedTo'])
+            if self.attachedTo is not None:
+                self.state = STATE_ATTACHED
 
     def draw(self):
         if self.facing == Button.FACING_LEFT:
@@ -48,5 +58,20 @@ class Button(GameObject):
 
     def activate(self):
         print 'BUTTON ACTIVATE'
-        if self.attachedTo is not None:
+        if self.state == STATE_ATTACHED:
             self.attachedTo.activate()
+
+    def update(self, delta):
+        if self.state == STATE_UNATTACHED:
+            self.vy += GRAVITY_ACCEL * delta
+            collided, mx, my = sweepMovement(self.world, self.getRect(), 0, self.vy*delta)
+            self.x += mx
+            self.y += my
+            if collided:
+                self.vy = 0
+
+    def popOff(self):
+        self.state = STATE_UNATTACHED
+        self.attachedTo = None
+        self.vy = 0
+

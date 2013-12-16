@@ -1,7 +1,7 @@
 from rect import Rect
 from texturemanager import TextureManager
 import pygame
-from utils import drawRect, debugRect
+from utils import drawRect, debugRect, sweepMovement
 from gameobject import GameObject
 
 WALK_SPEED = 300.0
@@ -109,27 +109,9 @@ class Player(GameObject):
         return self.world.rectOverlaps(self.getRect(self.x, self.y+0.5))
 
     def move(self, dx, dy):
-        startRect = self.getRect(self.x,self.y)
-        endRect = self.getRect(self.x+dx,self.y+dy)
-        merged = startRect.mergedCopy(endRect)
-
-        if not self.world.rectOverlaps(merged):
-            self.x += dx
-            self.y += dy
-            return False
-
-        minT = 0
-        maxT = 1
-        for n in range(10):
-            testT = (minT+maxT)*0.5
-            if self.world.rectOverlaps(self.getRect(self.x+dx*testT,self.y+dy*testT)):
-                maxT = testT
-            else:
-                minT = testT
-
-        self.x += dx*minT
-        self.y += dy*minT
-        return minT < 1
+        collided, movedX, movedY = sweepMovement(self.world, self.getRect(self.x,self.y), dx, dy)
+        self.x += movedX
+        self.y += movedY
 
     def draw(self):
         #print 'draw %f,%f' % (self.x, self.y)
